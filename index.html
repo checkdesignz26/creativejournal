@@ -115,6 +115,30 @@ body{background:radial-gradient(circle at 25% 15%,var(--desk),var(--desk2));font
 [data-status=Drafting] .stamp{color:#c08a2a}[data-status=Sent] .stamp{color:#3a7fc0}[data-status=In\ talks] .stamp{color:#8a55c0}[data-status=Won] .stamp{color:#2c9a54}[data-status=Declined] .stamp{color:#c05a5a}
 .note{background:#fff8d8;border-radius:4px;padding:8px 10px;box-shadow:0 2px 5px rgba(0,0,0,.12);margin-top:4px}
 .toast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:#2b4547;color:#fff;padding:8px 16px;border-radius:999px;font-size:13px;z-index:50}
+
+/* rich text + flowing pages */
+.rtb{display:flex;align-items:center;gap:5px;padding:3px 16px 6px;overflow-x:auto;scrollbar-width:none;transition:opacity .2s}
+.rtb::-webkit-scrollbar{display:none}
+.rtb.off{opacity:.38;pointer-events:none}
+.rtb>*{flex:none}
+.rtb button,.rtb select{height:30px;border-radius:8px;border:1px solid rgba(43,69,71,.15);background:rgba(255,255,255,.75);color:var(--ink);font:600 13px system-ui;cursor:pointer;padding:0 9px}
+.rtb button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.rtb .sep{width:1px;height:20px;background:rgba(43,69,71,.22);margin:0 3px}
+.rtb .dot{width:22px;height:22px;min-width:22px;border-radius:50%;padding:0;border:2px solid #fff;box-shadow:0 0 0 1px rgba(43,69,71,.28);background:var(--c)}
+.rtb .dot.hl{border-radius:6px}
+.rtb input[type=color]{width:30px;height:30px;padding:0;border:0;border-radius:8px;background:none;cursor:pointer}
+.rtb .lab{font:700 10px system-ui;color:var(--muted);letter-spacing:.6px;text-transform:uppercase}
+.page.flow .inner{padding:22px 40px 34px;overflow:hidden;gap:0}
+.fhead{height:118px;flex:none;overflow:hidden;display:flex;flex-direction:column;gap:3px}
+.fcont{height:26px;flex:none;font:italic 12px Georgia,serif;color:var(--muted);line-height:26px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fview{flex:none;position:relative;overflow:hidden;background-image:repeating-linear-gradient(transparent 0 27px,var(--line) 27px 28px)}
+.ftext,.fnotes{font:16px/28px "Bradley Hand","Segoe Print","Noteworthy","Comic Sans MS",cursive;color:var(--ink);outline:0;overflow-wrap:anywhere;position:relative;min-height:28px;-webkit-user-select:text;user-select:text}
+.ftext *,.fnotes *{line-height:28px}
+.ftext div,.fnotes div{margin:0}
+.ftext ul,.ftext ol,.fnotes ul,.fnotes ol{margin:0;padding-left:26px}
+.ftext li,.fnotes li{margin:0}
+.ftext.empty[data-pg="0"]::before,.fnotes.empty::before{content:attr(data-ph);color:#a9c0c0;position:absolute;left:0;top:0;pointer-events:none;font-style:italic}
+.fnotes{flex:1;min-height:220px;overflow-y:auto;margin-top:6px;background-image:repeating-linear-gradient(transparent 0 27px,var(--line) 27px 28px);background-attachment:local}
 </style>
 </head>
 <body>
@@ -125,6 +149,28 @@ body{background:radial-gradient(circle at 25% 15%,var(--desk),var(--desk2));font
     <button class="tbtn" data-act="export">Export</button>
     <button class="tbtn" data-act="import">Import</button>
     <input type="file" id="impfile" accept="application/json" hidden>
+  </div>
+  <div class="rtb off" id="rtb" role="toolbar" aria-label="Text formatting">
+    <select id="rtFont" aria-label="Font"><option value="">Font</option><option value='"Bradley Hand","Segoe Print","Noteworthy","Comic Sans MS",cursive'>Handwritten</option><option value='Georgia,"Times New Roman",serif'>Classic serif</option><option value='-apple-system,"Avenir Next","Segoe UI",Roboto,sans-serif'>Clean sans</option><option value='"American Typewriter","Courier New",monospace'>Typewriter</option><option value='"Snell Roundhand","Apple Chancery","Segoe Script","Brush Script MT",cursive'>Script</option><option value='"Marker Felt","Chalkboard SE","Comic Sans MS",fantasy'>Marker</option></select>
+    <select id="rtSize" aria-label="Text size"><option value="">Size</option><option value="13">Small</option><option value="16">Normal</option><option value="20">Large</option><option value="26">Huge</option></select>
+    <span class="sep"></span>
+    <button data-cmd="bold" title="Bold" aria-label="Bold"><b>B</b></button>
+    <button data-cmd="italic" title="Italic" aria-label="Italic"><i style="font-family:Georgia,serif">I</i></button>
+    <button data-cmd="underline" title="Underline" aria-label="Underline"><u>U</u></button>
+    <button data-cmd="strikeThrough" title="Strikethrough" aria-label="Strikethrough"><s>S</s></button>
+    <span class="sep"></span>
+    <span class="lab">Text</span><button class="dot" data-fore="#2b4547" style="--c:#2b4547" title="Text colour #2b4547" aria-label="Text colour"></button><button class="dot" data-fore="#d9534f" style="--c:#d9534f" title="Text colour #d9534f" aria-label="Text colour"></button><button class="dot" data-fore="#f0922b" style="--c:#f0922b" title="Text colour #f0922b" aria-label="Text colour"></button><button class="dot" data-fore="#4f9d63" style="--c:#4f9d63" title="Text colour #4f9d63" aria-label="Text colour"></button><button class="dot" data-fore="#2f9c9c" style="--c:#2f9c9c" title="Text colour #2f9c9c" aria-label="Text colour"></button><button class="dot" data-fore="#3f77c4" style="--c:#3f77c4" title="Text colour #3f77c4" aria-label="Text colour"></button><button class="dot" data-fore="#8a63c9" style="--c:#8a63c9" title="Text colour #8a63c9" aria-label="Text colour"></button><button class="dot" data-fore="#d6609f" style="--c:#d6609f" title="Text colour #d6609f" aria-label="Text colour"></button><input type="color" id="rtColor" value="#2b4547" title="Custom text colour" aria-label="Custom text colour">
+    <span class="sep"></span>
+    <span class="lab">Mark</span><button class="dot hl" data-hl="#fff1a0" style="--c:#fff1a0" title="Highlight" aria-label="Highlight"></button><button class="dot hl" data-hl="#ffd3df" style="--c:#ffd3df" title="Highlight" aria-label="Highlight"></button><button class="dot hl" data-hl="#c9efe4" style="--c:#c9efe4" title="Highlight" aria-label="Highlight"></button><button class="dot hl" data-hl="#d3e2ff" style="--c:#d3e2ff" title="Highlight" aria-label="Highlight"></button><button data-hl="transparent" title="Remove highlight" aria-label="Remove highlight">✕</button>
+    <span class="sep"></span>
+    <button data-cmd="justifyLeft" title="Align left" aria-label="Align left"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 2h14M1 7h9M1 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></button>
+    <button data-cmd="justifyCenter" title="Centre" aria-label="Centre"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 2h14M4 7h8M2 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></button>
+    <button data-cmd="justifyRight" title="Align right" aria-label="Align right"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 2h14M6 7h9M3 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></button>
+    <span class="sep"></span>
+    <button data-cmd="insertUnorderedList" title="Bullet list" aria-label="Bullet list">• List</button>
+    <button data-cmd="insertOrderedList" title="Numbered list" aria-label="Numbered list">1. List</button>
+    <span class="sep"></span>
+    <button data-clear="1" title="Clear formatting" aria-label="Clear formatting">Clear</button>
   </div>
   <div class="stage">
     <div class="bookwrap">
@@ -177,7 +223,7 @@ const SECTIONS=[
  {id:'todo',label:'To-do',color:'#f0b988',type:'todo',rows:10}
 ];
 const NEW={
- journal:()=>({date:today(),title:'',tags:'',body:''}),
+ journal:()=>({date:today(),title:'',tags:'',rich:''}),
  board:()=>({title:'',notes:'',images:[]}),
  palette:()=>({title:'',notes:'',colors:['#2f9c9c','#f2a7a7','#f5cf8a','#fffdf7','#2b4547']}),
  milestone:()=>({title:'',platform:'Etsy',date:'',done:false}),
@@ -191,6 +237,20 @@ const chunk=(a,n)=>{const o=[];for(let i=0;i<a.length;i+=n)o.push(a.slice(i,i+n)
 const opts=(arr,v)=>arr.map(o=>`<option${o===v?' selected':''}>${E(o)}</option>`).join('');
 const X=id=>`<button class="x" title="Remove" data-act="del" data-id="${id}">✕</button>`;
 const D=(id,k)=>`data-id="${id}" data-k="${k}"`;
+
+/* ---------- rich text helpers ---------- */
+const richEmpty=h=>!String(h||'').replace(/<[^>]*>/g,'').replace(/&nbsp;|\s/g,'');
+const jRich=j=>j.rich!=null?j.rich:E(j.body||'').replace(/\n/g,'<br>');
+const pRich=p=>p.notesHtml!=null?p.notesHtml:E(p.notes||'').replace(/\n/g,'<br>');
+function clean(h){const t=document.createElement('template');t.innerHTML=String(h||'');
+ t.content.querySelectorAll('script,style,iframe,object,embed,link,meta,img,svg,form,input,button,textarea,select,video,audio').forEach(n=>n.remove());
+ t.content.querySelectorAll('*').forEach(n=>{[...n.attributes].forEach(a=>{const k=a.name.toLowerCase();if(k==='style')n.setAttribute('style',a.value.replace(/url\([^)]*\)|expression\([^)]*\)|@import/gi,''));else if(k!=='size')n.removeAttribute(a.name)})});
+ return t.innerHTML}
+function flowGeo(){const bk=$('#book'),ph=bk.clientHeight||600,bw=bk.clientWidth||800,sw=single()?bw:bw/2;
+ const W=Math.max(120,Math.floor(sw-80)),top=22,bot=34,head=118,cont=26;
+ return{W,h1:Math.max(56,Math.floor((ph-top-head-bot)/28)*28),H:Math.max(56,Math.floor((ph-top-cont-bot)/28)*28)}}
+function measureH(html,W){const m=document.createElement('div');m.className='ftext';m.style.cssText=`position:absolute;left:-9999px;top:0;visibility:hidden;width:${W}px;min-height:0`;m.innerHTML=html||'';document.body.appendChild(m);const h=Math.max(28,m.offsetHeight);m.remove();return h}
+const pagesFor=(h,g)=>h<=g.h1?1:1+Math.ceil((h-g.h1)/g.H);
 
 /* ---------- page builders ---------- */
 function addPage(label,type,hint){return{html:`<div class="addbox"><div class="plus">+</div><button class="btn" data-act="add" data-type="${type}">${label}</button><p class="sub">${hint}</p></div>`}}
@@ -219,11 +279,22 @@ function buildPages(sec){
    <div class="kicker">Recent journal</div>${li(rec,j=>`<li>${E(j.title)} <span class="sub">· ${E(j.date)}</span></li>`)}`}
   ];
  }
- if(sec==='journal')return list('journal').map(j=>({cls:'margin',html:`<div class="row2"><span class="kicker">Design diary</span>${X(j.id)}</div>
+ if(sec==='journal'){
+  const g=flowGeo(),out=[];
+  list('journal').forEach(j=>{
+   const html=clean(jRich(j)),total=pagesFor(measureH(html,g.W),g),st=out.length,empty=richEmpty(html);
+   for(let k=0;k<total;k++){
+    const off=k===0?0:g.h1+(k-1)*g.H,vh=k===0?g.h1:g.H;
+    const head=k===0?`<div class="fhead"><div class="row2"><span class="kicker">Design diary</span>${X(j.id)}</div>
   <input type="date" class="date" value="${E(j.date)}" ${D(j.id,'date')}>
   <input class="title" placeholder="Title of this page" value="${E(j.title)}" ${D(j.id,'title')} data-focus>
-  <input class="tags" placeholder="Tags: floral, autumn, new collection" value="${E(j.tags)}" ${D(j.id,'tags')}>
-  <textarea class="ruled" placeholder="What are you working on? Ideas, what worked, what to try next…" ${D(j.id,'body')}>${E(j.body)}</textarea>`})).concat(addPage('New journal page','journal','Ideas, process notes, what you learned today.'));
+  <input class="tags" placeholder="Tags: floral, autumn, new collection" value="${E(j.tags)}" ${D(j.id,'tags')}></div>`
+     :`<div class="fcont">${E(j.title||'Untitled')} · continued</div>`;
+    out.push({cls:'margin flow',pid:k===0?j.id:undefined,html:`${head}<div class="fview" style="height:${vh}px"><div class="ftext${empty?' empty':''}" contenteditable="true" spellcheck="true" data-id="${j.id}" data-pg="${k}" data-s="${st}" data-ph="Start writing… ideas, what worked, what to try next" style="width:${g.W}px;min-height:${off+vh}px;transform:translateY(${-off}px)">${html}</div></div>`});
+   }
+  });
+  return out.concat(addPage('New journal page','journal','Ideas, process notes, what you learned today.'));
+ }
  if(sec==='boards')return list('board').map(b=>({html:`<div class="row2"><span class="kicker">Moodboard</span>${X(b.id)}</div>
   <input class="title" placeholder="Board name (e.g. Winter Meadow)" value="${E(b.title)}" ${D(b.id,'title')} data-focus>
   <input class="tags" placeholder="Theme, inspiration, target customer…" value="${E(b.notes)}" ${D(b.id,'notes')}>
@@ -254,7 +325,7 @@ function buildPages(sec){
   <div class="row2" style="justify-content:flex-start;gap:10px"><span class="stamp">${E(p.status)}</span><select ${D(p.id,'status')}>${opts(STATUSES,p.status)}</select></div>
   <input class="tags" placeholder="Contact name / email" value="${E(p.contact)}" ${D(p.id,'contact')}>
   <div class="row" style="border:0"><label class="sub">Sent <input type="date" ${D(p.id,'date')} value="${E(p.date)}"></label><label class="sub">Follow up <input type="date" ${D(p.id,'follow')} value="${E(p.follow)}"></label></div>
-  <textarea class="ruled" placeholder="Which designs, what you offered, what they said…" ${D(p.id,'notes')}>${E(p.notes)}</textarea>`})).concat(addPage('New pitch','pitch','Track every company you pitch to and how it went.'));
+  <div class="fnotes${richEmpty(pRich(p))?' empty':''}" contenteditable="true" spellcheck="true" data-id="${p.id}" data-ph="Which designs, what you offered, what they said…">${clean(pRich(p))}</div>`})).concat(addPage('New pitch','pitch','Track every company you pitch to and how it went.'));
  return[];
 }
 function salesSummary(){
@@ -288,10 +359,14 @@ function draw(v){
  $('#slotR').replaceChildren(...(sg?[]:[pageEl(v.R,'R',v.idx+2)]));
  drawSpiral();
  $('#tabs').innerHTML=SECTIONS.map(s=>`<button class="tab${s.id===v.sec?' on':''}" style="--tc:${s.color}" data-act="tab" data-sec="${s.id}">${s.label}</button>`).join('');
- const step=sg?1:2;
- $('#prev').disabled=v.idx<=0;$('#next').disabled=v.idx+step>=v.n;
- $('#info').textContent=`${secOf(v.sec).label} · `+(sg||!v.R||v.R.blank?`page ${v.idx+1}`:`pages ${v.idx+1}–${v.idx+2}`)+` of ${v.n}`;
+ lastDims=[$('#book').clientWidth,$('#book').clientHeight];
+ updateNav();
+ $('#rtb').classList.toggle('off',!document.querySelector('#book .ftext,#book .fnotes'));
 }
+let lastDims=[0,0];
+function updateNav(){const v=cur,sg=v.sg,stp=sg?1:2;
+ $('#prev').disabled=v.idx<=0;$('#next').disabled=v.idx+stp>=v.n;
+ $('#info').textContent=`${secOf(v.sec).label} · `+(sg||!v.R||v.R.blank?`page ${v.idx+1}`:`pages ${v.idx+1}–${v.idx+2}`)+` of ${v.n}`}
 function makeFlipper(frontEl,backEl,css){const f=document.createElement('div');f.className='flipper';Object.assign(f.style,css);
  const a=document.createElement('div');a.className='face front';a.appendChild(frontEl);const b=document.createElement('div');b.className='face back';b.appendChild(backEl);f.append(a,b);$('#book').appendChild(f);return f}
 async function nav(sec,idx){
@@ -332,8 +407,8 @@ const redraw=()=>draw(view(cur.sec,cur.idx));
 async function addItem(type){
  const S=SECTIONS.find(s=>s.type===type),it={id:uid(),type,created:Date.now(),updated:Date.now(),...NEW[type]()};
  items.push(it);put(it);
- const n=buildPages(S.id).length;
- await go(S.id,S.rows?n-1:n-2);
+ const pgs=buildPages(S.id),fi=pgs.findIndex(p=>p.pid===it.id);
+ await go(S.id,S.rows?pgs.length-1:(fi>=0?fi:pgs.length-2));
  const el=document.querySelector(`#book [data-id="${it.id}"][data-focus]`);if(el&&!matchMedia('(hover:none)').matches)el.focus();
 }
 function readImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),i=new Image();i.onload=()=>{res(i);setTimeout(()=>URL.revokeObjectURL(u),3000)};i.onerror=rej;i.src=u})}
@@ -362,7 +437,9 @@ document.addEventListener('click',async e=>{
  else if(a==='import')$('#impfile').click();
 });
 document.addEventListener('input',e=>{
- const el=e.target,id=el.dataset.id;if(!id)return;const it=byId(id);if(!it)return;
+ const el=e.target;
+ if(el.classList&&(el.classList.contains('ftext')||el.classList.contains('fnotes'))){commit(el);return}
+ const id=el.dataset.id;if(!id)return;const it=byId(id);if(!it)return;
  if(el.dataset.ci!==undefined){it.colors[+el.dataset.ci]=el.value;const chip=el.closest('.chip');chip.style.setProperty('--c',el.value);const h=chip.querySelector('.hex');h.textContent=el.value;h.dataset.text=el.value}
  else if(el.dataset.img!==undefined){it.images[+el.dataset.img].cap=el.value}
  else if(el.dataset.k){const k=el.dataset.k;it[k]=el.type==='checkbox'?el.checked:el.value;
@@ -382,12 +459,82 @@ document.addEventListener('change',async e=>{
  el.value='';
 });
 
+
+/* ---------- rich text editor ---------- */
+try{document.execCommand('defaultParagraphSeparator',false,'div')}catch(e){}
+let lastShift=0,navT=null,pendSize=16,lastSel=null;
+const edOf=n=>{const e=n&&(n.nodeType===1?n:n.parentElement);return e&&e.closest?e.closest('.ftext,.fnotes'):null};
+function pathOf(root,node){const p=[];while(node&&node!==root){p.unshift(Array.prototype.indexOf.call(node.parentNode.childNodes,node));node=node.parentNode}return p}
+function nodeAt(root,p){let n=root;for(const i of p){n=n.childNodes[i];if(!n)return null}return n}
+const nlen=n=>n.nodeType===3?n.length:n.childNodes.length;
+function saveSel(root,norm){const sel=getSelection();if(!sel.rangeCount||!root.contains(sel.anchorNode)||!root.contains(sel.focusNode))return null;if(norm)root.normalize();
+ return{a:pathOf(root,sel.anchorNode),ao:sel.anchorOffset,f:pathOf(root,sel.focusNode),fo:sel.focusOffset}}
+function restoreSel(root,sv){const sel=getSelection();if(!sv){return}
+ const a=nodeAt(root,sv.a),f=nodeAt(root,sv.f);
+ try{if(a&&f)sel.setBaseAndExtent(a,Math.min(sv.ao,nlen(a)),f,Math.min(sv.fo,nlen(f)));else{const r=document.createRange();r.selectNodeContents(root);r.collapse(false);sel.removeAllRanges();sel.addRange(r)}}catch(e){}}
+function fixFonts(ed){const fs=ed.querySelectorAll('font[size],span[style*="xxx-large"]');if(!fs.length)return;const sv=saveSel(ed,false);
+ fs.forEach(f=>{if(f.tagName==='SPAN'){f.style.fontSize=pendSize+'px';return}const sp=document.createElement('span');sp.style.fontSize=pendSize+'px';while(f.firstChild)sp.appendChild(f.firstChild);sp.querySelectorAll('[style*="font-size"]').forEach(x=>{x.style.fontSize=''});f.replaceWith(sp)});
+ restoreSel(ed,sv)}
+function commit(ed){
+ const it=byId(ed.dataset.id);if(!it)return;
+ fixFonts(ed);
+ const html=ed.innerHTML,emp=richEmpty(html);
+ if(ed.classList.contains('fnotes')){it.notesHtml=html;ed.classList.toggle('empty',emp);touch(it);return}
+ it.rich=html;touch(it);
+ document.querySelectorAll(`#book .ftext[data-id="${it.id}"]`).forEach(o=>{if(o!==ed)o.innerHTML=html;o.classList.toggle('empty',emp)});
+ document.querySelectorAll('#book .fview').forEach(v=>{v.scrollTop=0});
+ clearTimeout(navT);navT=setTimeout(()=>{if(cur&&!busy){cur.n=buildPages(cur.sec).length;updateNav()}},250);
+ flowCheck(ed)}
+function caretY(ed){const sel=getSelection();if(!sel.rangeCount||!sel.focusNode)return null;
+ const r=document.createRange();try{r.setStart(sel.focusNode,sel.focusOffset)}catch(e){return null}r.collapse(true);
+ let rc=r.getClientRects()[0];
+ if(!rc||(!rc.height&&!rc.width)){const n=sel.focusNode.nodeType===1?sel.focusNode:sel.focusNode.parentElement;rc=n.getBoundingClientRect()}
+ return rc.top+Math.min(rc.height||28,28)/2-ed.getBoundingClientRect().top}
+function flowCheck(ed){
+ if(!ed||!ed.classList.contains('ftext')||busy||performance.now()-lastShift<120)return;
+ const y=caretY(ed);if(y==null)return;
+ const g=flowGeo(),pg=+ed.dataset.pg,st=+ed.dataset.s,id=ed.dataset.id;
+ const t=y<g.h1?0:1+Math.floor((y-g.h1)/g.H);
+ document.querySelectorAll('#book .fview').forEach(v=>{v.scrollTop=0});
+ if(t===pg)return;
+ const sv=saveSel(ed,true);
+ let tg=document.querySelector(`#book .ftext[data-id="${id}"][data-pg="${t}"]`);
+ if(!tg){draw(view('journal',st+t));tg=document.querySelector(`#book .ftext[data-id="${id}"][data-pg="${t}"]`)}
+ lastShift=performance.now();
+ if(tg){try{tg.focus({preventScroll:true})}catch(e){tg.focus()}restoreSel(tg,sv)}}
+function getEd(){
+ let ed=edOf(document.activeElement);
+ if(!ed&&lastSel&&document.contains(lastSel.ed)){ed=lastSel.ed;try{ed.focus({preventScroll:true})}catch(e){ed.focus()}restoreSel(ed,lastSel.sv)}
+ return ed}
+function rt(cmd,val){
+ const ed=getEd();if(!ed)return;
+ try{
+  if(cmd==='size'){pendSize=+val;document.execCommand('styleWithCSS',false,false);document.execCommand('fontSize',false,'7')}
+  else if(cmd==='hl'){document.execCommand('styleWithCSS',false,true);if(!document.execCommand('hiliteColor',false,val))document.execCommand('backColor',false,val)}
+  else{document.execCommand('styleWithCSS',false,true);document.execCommand(cmd,false,val)}
+ }catch(e){}
+ commit(ed);tbState()}
+function tbState(){const sel=getSelection();if(!sel.rangeCount||!edOf(sel.anchorNode))return;
+ document.querySelectorAll('#rtb [data-cmd]').forEach(b=>{let on=false;try{on=document.queryCommandState(b.dataset.cmd)}catch(e){}b.classList.toggle('on',!!on)})}
+document.addEventListener('selectionchange',()=>{
+ const sel=getSelection();const ed=sel.rangeCount?edOf(sel.anchorNode):null;if(!ed)return;
+ lastSel={ed,sv:saveSel(ed,false)};tbState();flowCheck(ed)});
+document.addEventListener('paste',e=>{const ed=edOf(e.target);if(!ed)return;e.preventDefault();
+ const t=(e.clipboardData||window.clipboardData).getData('text/plain');document.execCommand('insertText',false,t)});
+const rtbEl=$('#rtb');
+rtbEl.addEventListener('mousedown',e=>{if(e.target.closest('button'))e.preventDefault()});
+rtbEl.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.cmd)rt(b.dataset.cmd);else if(b.dataset.fore)rt('foreColor',b.dataset.fore);else if(b.dataset.hl)rt('hl',b.dataset.hl);else if(b.dataset.clear)rt('removeFormat')});
+$('#rtFont').addEventListener('change',e=>{if(e.target.value)rt('fontName',e.target.value);e.target.value=''});
+$('#rtSize').addEventListener('change',e=>{if(e.target.value)rt('size',e.target.value);e.target.value=''});
+$('#rtColor').addEventListener('change',e=>rt('foreColor',e.target.value));
+
 /* swipe + keys + resize */
 let sx=null,sy=0;const bk=$('#book');
-bk.addEventListener('pointerdown',e=>{if(e.target.closest('input,textarea,select,button,label'))return sx=null;sx=e.clientX;sy=e.clientY});
+bk.addEventListener('pointerdown',e=>{if(e.target.closest('input,textarea,select,button,label,[contenteditable="true"]'))return sx=null;sx=e.clientX;sy=e.clientY});
 bk.addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){dx<0?next():prev()}});
-document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev()});
-let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(cur&&!busy)redraw()},150)});
+document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)||document.activeElement.isContentEditable)return;if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev()});
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(cur&&!busy&&($('#book').clientWidth!==lastDims[0]||$('#book').clientHeight!==lastDims[1]))redraw()},150)});
 
 /* ---------- start ---------- */
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
